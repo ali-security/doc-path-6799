@@ -36,11 +36,6 @@ function setPath(document, keyPath, value) {
         throw new Error('No keyPath was provided.');
     }
 
-    // If this is clearly a prototype pollution attempt, then refuse to modify the path
-    if (keyPath.startsWith('__proto__') || keyPath.startsWith('constructor')) {
-        return document;
-    }
-
     return _setPath(document, keyPath, value);
 }
 
@@ -50,6 +45,11 @@ function _setPath(document, keyPath, value) {
     }
 
     let {indexOfDot, currentKey, remainingKeyPath} = computeStateInformation(keyPath);
+
+    // If this is clearly a prototype pollution attempt, then refuse to modify the path
+    if (keyPath.startsWith('__proto__') || keyPath.startsWith('constructor') || keyPath.startsWith('prototype')) {
+        return document;
+    }
 
     if (indexOfDot >= 0) {
         // If there is a '.' in the keyPath, recur on the subdoc and ...
